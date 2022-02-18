@@ -24,7 +24,7 @@ A_np, X_np = load_XA(dataset, datadir = dataset_path)
 num_nodes = X_np.shape[0]
 L = load_labels(dataset, datadir = dataset_path)
 num_classes = max(L) + 1
-ckpt_destilado = load_ckpt('SGC_'+dataset,datadir = in_path)
+ckpt_destilado = load_ckpt('SGC_train_'+dataset,datadir = in_path)
 # #SGC_1_camada_one_hot
 
 A = torch.tensor(A_np, dtype=torch.float32).to(device)
