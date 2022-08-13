@@ -133,14 +133,18 @@ for node in node_list:
 
         nodes_explanations_aux[node] = generating_explanations(node, explainer, edge_index, X, t, k)[node]
         acc, prec = evaluate_syn_explanation(nodes_explanations_aux, dataset)
-        if acc == 1.0:
-            break
+        if acc > acc_top: 
+          acc_top = acc
+          exp_top = nodes_explanations_aux[node]
+
+         if acc == 1.0:
+          break
 
     params = list(explainer.parameters())
     min_point = torch.norm(params[0].grad)
     results[node] = ['minimum point:{} | number of neighbors: {} | accuracy: {}'.format(min_point, len(neighbors), acc)]
 
-    nodes_explanations[node] = generating_explanations(node, explainer, edge_index, X, t, k)[node]
+    nodes_explanations[node] = exp_top #generating_explanations(node, explainer, edge_index, X, t, k)[node]
     acc, prec = evaluate_syn_explanation(nodes_explanations, dataset)
 
     print("Accuracy: ", acc)
