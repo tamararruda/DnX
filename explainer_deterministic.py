@@ -97,45 +97,27 @@ accs = []
 #y = A_pot @ X @ W.T + bias
 
 for no_alvo in node_list:
-    nodes_neigh, _, node_ex, _ = k_hop_subgraph(int(no_alvo), 3, edge_index)
-    results = []
-    idxs = []
+        inicio = time.time()
+        nodes_neigh, _, node_ex, _ = k_hop_subgraph(int(no_alvo), layer, edge_index)
+        results = []
+        idxs = []
 
-    # multiplica cada node-feature pelo peso correspondete da matriz A_pot
-    # for idx, Xi in zip(nodes_neigh, X[nodes_neigh]):
-    #     S = Xi * A_pot[no_alvo, int(idx.item())]
-    #     results.append(S.tolist())
-    #     idxs.append(idx.tolist())
+        S = (X[nodes_neigh].T * A_pot[no_alvo, nodes_neigh]).T       
+        pred = torch.matmul(S, W.T)  # # multiplica os pesos do SGC pelos vetores Xi ponderados    
+        L = torch.ones(len(nodes_neigh), len(pred_model[no_alvo])).to(device) * pred_model[no_alvo] - bias#pred_model[no_alvo] - bias 
+        expl = torch.diag(torch.matmul(L, pred.T) )
 
-    results = (X[nodes_neigh].T * A_pot[no_alvo, nodes_neigh]).T
-    results = results.to(device)
-    expl = []
+        #expl = A_pot[no_alvo, nodes_neigh]
 
-    list_pred = []
-    for i in results:
-        pred = torch.matmul(i, W.T)  # multiplica os pesos do SGC pelos vetores Xi ponderados
+        #expl[torch.where(nodes_neigh==no_alvo)] = expl.sum()
 
-        L = pred_model[no_alvo] - bias
-        projection = torch.matmul(pred.T, L)
-        tam_projection = projection
+        if len(nodes_neigh)<k:
+          k_nodes= len(nodes_neigh)
+        values, nodes = torch.topk(expl, dim=0,k=k_nodes)
+        k_nodes = k
 
-        # tam_projection = torch.norm(pred)
-
-        # validando
-        # list_pred.append(pred.tolist())
-        # torch.tensor(list_pred).sum(dim=0).to(device) + bias
-
-        expl.append(tam_projection.tolist())
-    expl = torch.tensor(expl)
-
-    # dar mais importância ao nó alvo
-    expl[torch.where(nodes_neigh == no_alvo)] = expl.sum()
-
-    if len(nodes_neigh) < k:
-        k = len(nodes_neigh)
-    values, nodes = torch.topk(expl, dim=0, k=k)
-
-    explanations[no_alvo] = nodes_neigh[nodes].tolist()
+        explanations[no_alvo] = nodes_neigh[nodes].tolist()
+    
 
 acc, prec = evaluate_syn_explanation(explanations,dataset)
 print("Accuracy: ", acc)
