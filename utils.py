@@ -3,10 +3,13 @@ import os
 import torch
 import numpy as np
 import pandas as pd
+from torch_geometric.utils import dense_to_sparse, add_self_loops, remove_self_loops, k_hop_subgraph
+from torch_geometric.nn.conv.gcn_conv import gcn_norm
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-
-def load_XA(dataname, datadir = "../Generate_XA_Data/XAL"):
+def load_XA(dataname, datadir = "XAL"):
     prefix = os.path.join(datadir,dataname)
     filename_A = prefix +"_A.npy"
     filename_X = prefix +"_X.npy"
@@ -14,7 +17,7 @@ def load_XA(dataname, datadir = "../Generate_XA_Data/XAL"):
     X = np.load(filename_X)
     return A, X
 
-def load_labels(dataname, datadir = "../Generate_XA_Data/XAL"):
+def load_labels(dataname, datadir = "XAL"):
     prefix = os.path.join(datadir,dataname)
     filename_L = prefix +"_L.npy"
     L = np.load(filename_L)
@@ -30,7 +33,7 @@ def create_filename(save_dir, dataname, isbest=False, num_epochs=-1):
         filename = os.path.join(filename, str(num_epochs))
     return filename + ".pth.tar"
 
-def load_ckpt(dataname, datadir = "../Generate_XA_Data/XAL", isbest=False):
+def load_ckpt(dataname, datadir = "XAL", isbest=False):
     '''Load a pre-trained pytorch model from checkpoint.
     '''
     filename = create_filename(datadir, dataname, isbest)
@@ -78,15 +81,46 @@ def mask(A):
 
   return mask_train, mask_val, mask_test
 
+
+
+def get_nodes_explained(dataset, A):
+
+    if dataset == 'syn1':
+        node_list = list(range(300,700))
+        k = 5
+    elif dataset == 'syn2':
+        node_list = list(range(300,700)) + list(range(1000,1400))
+        k = 5
+    elif dataset == 'syn3':
+        node_list = list(range(300,1020))
+        k=9
+    elif dataset == 'syn4':
+        node_list = list(range(511,871))
+        k=6
+    elif dataset == 'syn5':
+        node_list = list(range(511,1231))
+        k=9
+    elif dataset == 'syn6':
+        node_list = list(range(300,700))
+        k=5
+    else:
+        node_to_explain = [i for [i] in np.argwhere(np.sum(A,axis = 0) > 2)]
+        np.random.shuffle(node_to_explain)
+        node_list = node_to_explain
+        k=3
+
+    return node_list, k
+
 def create_filename_save(save_dir,dataset, isbest=False, num_epochs=-1):
     filename = os.path.join(save_dir, '')
     if isbest:
         filename = os.path.join(filename, "best")
-    return 'SGC_'+dataset + ".pth.tar"
+    return filename +'SGC_'+dataset + ".pth.tar"
 
 
 def save_checkpoint(model, optimizer, save_dir, dataset, num_epochs=100, isbest=False, save_data=None):
     filename = create_filename_save(save_dir, dataset, isbest, num_epochs=num_epochs)
+    print(filename)
     torch.save(
         {
             "epoch": num_epochs,
@@ -107,10 +141,10 @@ def evaluate_bitcoin_explanation(explanations, dataset, pred):
 
     # Get ground truth
     filename_pos = os.path.join(
-        '/content/drive/MyDrive/PGM_Explainer/PGM_Node/Generate_XA_Data/ground_truth_explanation/' + dataset,
+        'dataset/' + dataset,
         dataset + '_pos.csv')
     filename_neg = os.path.join(
-        '/content/drive/MyDrive/PGM_Explainer/PGM_Node/Generate_XA_Data/ground_truth_explanation/' + dataset,
+        'dataset/' + dataset,
         dataset + '_neg.csv')
     df_pos = pd.read_csv(filename_pos, header=None, index_col=0, squeeze=True).to_dict()
     df_neg = pd.read_csv(filename_neg, header=None, index_col=0, squeeze=True).to_dict()
@@ -137,6 +171,7 @@ def evaluate_bitcoin_explanation(explanations, dataset, pred):
                 true_pos = true_pos + 1
     precision = true_pos / pred_pos
     print("Explainer's precision is ", precision)
+    return precision
 
 
 def evaluate_syn_explanation(explanations, dataset):
@@ -154,8 +189,6 @@ def evaluate_syn_explanation(explanations, dataset):
     accuracy = true_positive / gt_positive
     precision = true_positive / pred_positive
 
-    # print("Accuracy: ", accuracy)
-    # print("Precision: ", precision)
     return accuracy, precision
 
 
@@ -210,3 +243,34 @@ def get_ground_truth_syn5(node):
     ground_truth = [buff - offset + val + 7 for val in base]
     return ground_truth
 
+def A_k_hop(A, hop):
+    edge_index, weight_edge = dense_to_sparse(A) 
+
+    edge_index, edge_weight = gcn_norm(edge_index.long(), add_self_loops=True) 
+
+    n_A = torch.zeros(A.shape) 
+
+    for i, j in enumerate(edge_index.T): 
+        n_A[j[0].item()][j[1].item()] = edge_weight[i]
+
+    A_pot = n_A
+    for i in range(hop-1):
+        A_pot = torch.matmul(n_A, A_pot) 
+    return A_pot
+
+
+def generating_explanations(node,model, explainer,edge_index, X,t, k):
+    explanations= {}
+    explainer.eval()
+    neighbors, sub_edge_index, node_idx_new, _ = k_hop_subgraph(int(node), 3, edge_index,relabel_nodes=True)
+    sub_X = X[neighbors,:]
+    node_idx_new, sub_edge_index, sub_X, neighbors =node_idx_new.to(device), sub_edge_index.to(device), sub_X.to(device), neighbors.to(device)
+
+    expl, _ = explainer(sub_X,sub_edge_index,model,t)
+    if len(neighbors)<k:
+        k= len(neighbors)
+    values, nodes = torch.topk(expl.squeeze(-1),dim=-1,k=k)
+    explic = neighbors[nodes]
+    explanations[node] =explic.tolist()
+    
+    return  explanations
