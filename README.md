@@ -1,13 +1,13 @@
 
-# ConveX
-
-This is th[README.md](https://github.com/tamararruda/ConveX/files/9826113/README.md)
-e source code for the paper: ConveXplainer for graph neural networks by Pereira, Tamara and Nascimento, Erik and Mesquita, Diego and Souza, Amauri
-
-
 # DnX and FastDnX 
 
-This folder contains the source code of using **DnX and FastDnX** to explain node classification.
+
+This is th[README.md](https://github.com/tamararruda/DnX/files/9826113/README.md)
+e source code for the paper: Distill n' Explain: explaining graph neural networks using simple surrogates by Pereira, Tamara and Nascimento, Erik and Resck, Lucas and Mesquita, Diego and Souza, Amauri
+
+This folder contains the source code of using **DnX and FastDnX** to explain node classification. 
+
+
 
 Example explaination:
 
