@@ -1,11 +1,10 @@
-
 import torch
 from torch_geometric.nn import  SGConv
 
 
-class Net(torch.nn.Module):
+class SGC(torch.nn.Module):
     def __init__(self,k, nfeat, nclass):
-          super(Net, self).__init__()
+          super(SGC, self).__init__()
           self.conv = SGConv(nfeat, nclass, k)
 
     def forward(self, x, edge_index):
