@@ -43,7 +43,7 @@ The nomenclature (syn1, syn2 ...., syn6) is used to facilitate experiments
 To run the DnX and Fast DnX explainers for the synthetic datasets just run the notebook `main_syn.ipynb`:
 
 
-** Cite **
+**Cite**
 
 ``` 
 @inproceedings{distillnexplain2023,
