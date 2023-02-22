@@ -1,15 +1,22 @@
 
 # DnX and FastDnX 
 
+This is repo for "Distill n' Explain: explaining graph neural networks using simple surrogates". This folder contains the source code of using **DnX and FastDnX** to explain node classification. 
 
-This is [README.md](https://github.com/tamararruda/DnX/files/9826113/README.md)
-is source code for the paper: Distill n' Explain: explaining graph neural networks using simple surrogates by Pereira, Tamara and Nascimento, Erik and Resck, Lucas and Mesquita, Diego and Souza, Amauri
+**Authors:**
 
-This folder contains the source code of using **DnX and FastDnX** to explain node classification. 
+* [Tamara Pereira](https://scholar.google.com/citations?hl=pt-BR&user=OwB9En0AAAAJ)
+* [Erik Jhones](https://scholar.google.com/citations?user=cg7qxqYAAAAJ&hl=pt-BR)
+* [Lucas Resck]()
+* [Diego Mesquita](https://twitter.com/wkly_infrmtive)
+* [Amauri H. Souza](https://amauriholanda.org/)
 
+**Requirements**
 
+We have built this implementation using:
 
-Example explaination:
+ * PyTorch 
+ * PyTorch Geometric
 
 Folder description:
   * trained_gcn: contains the models that will be explained
@@ -35,3 +42,14 @@ The nomenclature (syn1, syn2 ...., syn6) is used to facilitate experiments
 
 To run the DnX and Fast DnX explainers for the synthetic datasets just run the notebook `main_syn.ipynb`:
 
+
+** Cite **
+
+``` 
+@inproceedings{distillnexplain2023,
+  title={Distill n' Explain: explaining graph neural networks using simple surrogates},
+  author={T. A. Pereira and E. J. Nascimento and L. Resck and D. Mesquita and A. H. Souza and S. Kaski},
+  booktitle={Artificial Intelligence and Statistics (AISTATS)},
+  year={2023}
+}
+```
