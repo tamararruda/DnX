@@ -1,20 +1,19 @@
 
 # DnX and FastDnX 
 
-This is repo for "Distill n' Explain: explaining graph neural networks using simple surrogates". This folder contains the source code of using **DnX and FastDnX** to explain node classification. 
+This is repo for "Distill n' Explain: explaining graph neural networks using simple surrogates". This folder contains the source code of using **DnX and FastDnX** to explain node predictions. 
 
 **Authors:**
 
 * [Tamara Pereira](https://scholar.google.com/citations?hl=pt-BR&user=OwB9En0AAAAJ)
 * [Erik Jhones](https://scholar.google.com/citations?user=cg7qxqYAAAAJ&hl=pt-BR)
-* [Lucas Resck]()
-* [Diego Mesquita](https://twitter.com/wkly_infrmtive)
+* [Lucas E. Resck](https://github.com/lucasresck)
+* [Diego Mesquita](https://weakly-informative.github.io/)
 * [Amauri H. Souza](https://amauriholanda.org/)
 
 **Requirements**
 
 We have built this implementation using:
-
  * PyTorch 
  * PyTorch Geometric
 
