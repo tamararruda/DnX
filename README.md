@@ -47,7 +47,7 @@ To run the DnX and Fast DnX explainers for the synthetic datasets just run the n
 ``` 
 @inproceedings{distillnexplain2023,
   title={Distill n' Explain: explaining graph neural networks using simple surrogates},
-  author={T. A. Pereira and E. J. Nascimento and L. Resck and D. Mesquita and A. H. Souza and S. Kaski},
+  author={T. A. Pereira and E. J. Nascimento and L. E. Resck and D. Mesquita and A. H. Souza},
   booktitle={Artificial Intelligence and Statistics (AISTATS)},
   year={2023}
 }
