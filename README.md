@@ -1,7 +1,7 @@
 
 # DnX and FastDnX 
 
-This is repo for "Distill n' Explain: explaining graph neural networks using simple surrogates". This folder contains the source code of using **DnX and FastDnX** to explain node predictions. 
+This is repo for [Distill n' Explain: explaining graph neural networks using simple surrogates](https://arxiv.org/abs/2303.10139). This folder contains the source code of using **DnX and FastDnX** to explain node predictions. 
 
 **Authors:**
 
